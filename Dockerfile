@@ -1,33 +1,36 @@
-    # Use an official PHP runtime as a parent image
-    FROM php:8.3-fpm
+# Dockerfile untuk Laravel
+FROM php:8.2-fpm
 
-    # Set the working directory
-    WORKDIR /var/www/sipintar
+# Install dependencies
+RUN apt-get update && apt-get install -y \
+    libpng-dev \
+    libjpeg-dev \
+    libfreetype6-dev \
+    zip \
+    unzip \
+    git \
+    curl \
+    libonig-dev \
+    libzip-dev \
+    && docker-php-ext-install pdo_mysql mbstring zip exif pcntl
 
-    # Install Composer
-    RUN curl -sS https://getcomposer.org/download/stable/composer.phar -o /usr/local/bin/composer
-    RUN chmod a+x /usr/local/bin/composer
+# Install Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-    # Copy application directory
-    COPY . .
+# Set working directory
+WORKDIR /var/www
 
-    # Install dependencies
-    RUN composer install
+# Copy application files
+COPY . .
 
-    # Set permissions
-    RUN chown -R www-data:www-data ./storage ./bootstrap/cache
+# Set permissions
+RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
 
-    # Set environment variable
-    ENV APP_ENV=development
-    ENV APP_DEBUG=true
-    ENV APP_URL=http://localhost
+# Install dependencies
+RUN composer install --no-dev --optimize-autoloader
 
-    # User
-    USER www-data
+# Expose port
+EXPOSE 9000
 
-    # Set port 9000 to expose it for other container to reach
-    EXPOSE 80
-
-    # Command to run the application
-    # In this case, we use the artisan command to run the application
-    CMD ["php-fpm"]
+# Start PHP-FPM
+CMD ["php-fpm"]
