@@ -12,14 +12,14 @@
     COPY . .
 
     # Install dependencies
-    RUN composer install --no-dev
+    RUN composer install
 
     # Set permissions
     RUN chown -R www-data:www-data ./storage ./bootstrap/cache
 
     # Set environment variable
-    ENV APP_ENV=production
-    ENV APP_DEBUG=false
+    ENV APP_ENV=development
+    ENV APP_DEBUG=true
     ENV APP_URL=http://localhost
 
     # User
