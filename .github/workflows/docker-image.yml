@@ -1,17 +1,16 @@
 name: Docker Image CI
 
 on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+  workflow_run:
+    workflows: ["Laravel"]  # Menunggu Workflow 1 selesai
+    types:
+      - completed  # Bisa juga 'requested' atau 'in_progress'
 
 jobs:
 
   build:
 
     runs-on: ubuntu-latest
-    needs: Laravel
 
     steps:
     - uses: actions/checkout@v4
